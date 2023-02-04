@@ -14,6 +14,11 @@ def query_db(sqlite_path, query):
     cursor.execute(query) 
     records = cursor.fetchall()
     cursor.close()
+    if len(records) == 0:
+        sqlite_conn.close()
+        print("Closed connection to sqlite DB")
+        print("Exiting - No new messages found.")
+        quit()
     print(f'Retrieved {len(records)} results from query {query}')
     return records
    except sqlite3.Error as error:
