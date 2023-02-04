@@ -37,6 +37,16 @@ def verify_ingest_token(logscale_url, ingest_token):
         print(Fore.RED + f'ERROR - Failed to validate ingest token "{ingest_token}". HTTP Response; {response.status_code} {response.reason}')
         raise SystemExit(1)
 
+def verify_interval_settings(interval_unit, interval_value):
+    if not ((interval_unit == "MINUTES") or (interval_unit == "SECONDS") or (interval_unit == "HOURS")):
+        print(Fore.RED + f'ERROR - Unexpected value "{interval_unit}" specified for message retrieval interval units. Allowed values are "MINUTES" or "SECONDS" or "HOURS.')
+        raise SystemExit(1)
+    
+    try:
+        int(interval_value)
+    except:
+        print(Fore.RED + f'ERROR - Failed to parse value "{interval_value}" into a valid integer.')
+        raise SystemExit(1)
 
 
 init()
@@ -44,8 +54,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", action="store", help="Specify path to config.yml. If this is used, any other switches are ignored.")
 parser.add_argument("-u", "--logscale_url", action="store", help="FQDN:PORT of your logscale instance. e.g. https://cloud.community.humio.com")
 parser.add_argument("-i", "--ingest_token", action="store", help="Ingest token from the Falcon Logscale portal. Ensure the Pihole-sqlite3 parser is assigned to this token.")
-parser.add_argument("-iu", "--interval_unit", action="store", choices=["MINUTES","SECONDS"], default="MINUTES", help="Specify path to config.yml. If this is used, any other switches are ignored. Default Value: MINUTES")
-parser.add_argument("-iv", "--interval_value", action="store", default=5, help="Specify path to config.yml. If this is used, any other switches are ignored. \n Default Value: 5")
+parser.add_argument("-iu", "--interval_unit", action="store", choices=["MINUTES","SECONDS", "HOURS"], default="MINUTES", help="The units for the time you want to fetch messages from. e.g MINUTES and 5 = retrieve last 5 minutes of queries. Default Value: MINUTES")
+parser.add_argument("-iv", "--interval_value", action="store", default=5, help="How far back in time you want to retrieve messages. Default Value: 5")
 parser.add_argument("-d", "--database", action="store", default="/etc/pihole/pihole-FTL.db", help="Specify path to pihole-ftl.db. Default value: /etc/pihole/pihole-FTL.db")
 
 args = parser.parse_args()
@@ -68,13 +78,14 @@ if args.config:
         # Set variables
         logscale_url = options["logscale_url"]
         ingest_token = options["ingest_token"]
-        retrieval_units = options["message_retrieval"]["units"]
-        retrieval_interval = options["message_retrieval"]["interval"]
+        interval_unit = options["message_retrieval"]["units"]
+        interval_value = options["message_retrieval"]["interval"]
+        pihole_db = options["pihole_db"]
 
         # Verify config options
         verify_url(logscale_url)
         verify_ingest_token(logscale_url, ingest_token)
-
+        verify_interval_settings(interval_unit, interval_value)
 
 
 
