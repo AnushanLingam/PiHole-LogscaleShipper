@@ -49,6 +49,19 @@ def verify_interval_settings(interval_unit, interval_value):
         raise SystemExit(1)
 
 
+def verify_pihole_db(db_path):
+    if not Path(db_path).exists():
+        print(Fore.RED + f'ERROR - Pihole DB file not found at specified location: "{db_path}"')
+        raise SystemExit(1)
+
+    with open(db_path, 'rb') as db:
+        file_header = db.read(100)
+    if not file_header[:16] == b'SQLite format 3\x00':
+        print(Fore.RED + f'ERROR - File specified at "{db_path}" is not a valid SQLite DB file')
+        raise SystemExit(1)
+
+
+
 init()
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", action="store", help="Specify path to config.yml. If this is used, any other switches are ignored.")
@@ -84,9 +97,9 @@ if args.config:
 
         # Verify config options
         verify_url(logscale_url)
-        verify_ingest_token(logscale_url, ingest_token)
+        #verify_ingest_token(logscale_url, ingest_token)
         verify_interval_settings(interval_unit, interval_value)
-
+        verify_pihole_db(pihole_db)
 
 
 
