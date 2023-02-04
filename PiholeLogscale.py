@@ -2,6 +2,7 @@
 
 import argparse
 import yaml
+import requests
 from pathlib import Path
 from colorama import init
 from colorama import Fore, Back, Style
@@ -13,12 +14,28 @@ def verify_url(url):
         if all([result.scheme, result.netloc]):
             return True
         else:
-            return False
+            print(Fore.RED + f'ERROR - The logscale url "{logscale_url}" is not valid.')
+            raise SystemExit(1)
     except ValueError:
-        return False
+        print(Fore.RED + f'ERROR - The logscale url "{logscale_url}" is not valid.')
+        raise SystemExit(1)
 
 
+def verify_ingest_token(logscale_url, ingest_token):
 
+    req_url = f'{logscale_url}/api/v1/ingest/humio-unstructured'
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f'Bearer {ingest_token}'
+    }
+
+    response = requests.post(req_url, headers=headers)
+    if response.status_code == 401:
+        print(Fore.RED + f'ERROR - The ingest token "{ingest_token}" is not valid.')
+        raise SystemExit(1)
+    elif (not response.status_code == 401) and (not response.status_code == 400):
+        print(Fore.RED + f'ERROR - Failed to validate ingest token "{ingest_token}". HTTP Response; {response.status_code} {response.reason}')
+        raise SystemExit(1)
 
 
 
@@ -36,7 +53,7 @@ args = parser.parse_args()
 if args.config:
     config_path = Path(args.config)
     if not config_path.exists():
-        print(Fore.RED + "ERROR - Config file not found at specified location.")
+        print(Fore.RED + "ERROR - Config file not found at specified location: '{config_path}'")
         raise SystemExit(1)
     else:
         # Load YAML Config file
@@ -48,9 +65,18 @@ if args.config:
                 print(err)
                 raise SystemExit(1)
         
+        # Set variables
+        logscale_url = options["logscale_url"]
+        ingest_token = options["ingest_token"]
+        retrieval_units = options["message_retrieval"]["units"]
+        retrieval_interval = options["message_retrieval"]["interval"]
+
         # Verify config options
-        if not verify_url(options["logscale_url"]):
-            print(Fore.RED + "ERROR - The value for 'logscale_url' is not a valid URL.")
-            raise SystemExit(1)
+        verify_url(logscale_url)
+        verify_ingest_token(logscale_url, ingest_token)
+
+
+
+
 
 #print(args)
