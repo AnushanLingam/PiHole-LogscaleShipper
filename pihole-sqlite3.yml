@@ -1,0 +1,76 @@
+name: pihole-sqlite3
+tests:
+- 1675514699 2 3 mobile.events.data.microsoft.com 10.0.20.113 pihole2.bgc.co.uk None
+  None 3 0.0005 0
+- 1675514694 1 2 www.msftncsi.com 10.0.20.72 None 208.67.222.222#53 None 3 0.0099
+  0
+- 1675514699 1 14 mobile.events.data.microsoft.com 10.0.20.72 Anushan-PC.bgc.co.uk
+  None None 3 0.0004 0
+fieldsToBeRemovedBeforeParsing: []
+$schema: https://schemas.humio.com/parser/v0.2.0
+script: |
+  /(?<timestamp>\S+)\s+(?<QueryType>\S+)\s+(?<Status>\S+)\s+(?<Domain>\S+)\s+(?<ClientIP>\S+)\s+(?<ClientName>\S+)\s+(?<ForwardDest>\S+)\s+(?<AdditionalInfo>\S+)\s+(?<ReplyType>\S+)\s+(?<ReplyTimeSeconds>\S+)\s+(?<DNSSECStatus>\S+)/
+  | findTimestamp(field=timestamp, timezone="Europe/London")
+  | case{
+  QueryType=1 | QueryType := "A";
+  QueryType=2 | QueryType := "AAAA";
+  QueryType=3 | QueryType := "ANY";
+  QueryType=4 | QueryType := "SRV";
+  QueryType=5 | QueryType := "SOA";
+  QueryType=6 | QueryType := "PTR";
+  QueryType=7 | QueryType := "TXT";
+  QueryType=8 | QueryType := "NAPTR";
+  QueryType=9 | QueryType := "MX";
+  QueryType=10 | QueryType := "DS";
+  QueryType=11 | QueryType := "RRSIG";
+  QueryType=12 | QueryType := "DNSKEY";
+  QueryType=13 | QueryType := "NS";
+  QueryType=14 | QueryType := "OTHER";
+  QueryType=15 | QueryType := "SVCB";
+  QueryType=16 | QueryType := "HTTPS";
+  }
+  | case {
+  Status=0 | Status := "Unknown" | StatusDesc := "Unknown Status";
+  Status=1 | Status := "Blocked" | StatusDesc := "Domain in gravity database";
+  Status=2 | Status := "Allowed" | StatusDesc := "Forwarded";
+  Status=3 | Status := "Allowed" | StatusDesc := "Replied from cache";
+  Status=4 | Status := "Blocked" | StatusDesc := "Domain matched regex blacklist";
+  Status=5 | Status := "Blocked" | StatusDesc := "Domain in exact blacklist";
+  Status=6 | Status := "Blocked" | StatusDesc := "By upstream server (requesting IP on blocklist";
+  Status=7 | Status := "Blocked" | StatusDesc := "By local upstream server";
+  Status=8 | Status := "Blocked" | StatusDesc := "By upstream server (NXDOMAIN bit unset)";
+  Status=9 | Status := "Blocked" | StatusDesc := "CNAME Inspection domain in gravity database";
+  Status=10 | Status := "Blocked" | StatusDesc := "CNAME insepction domain matched regex blacklist";
+  Status=11 | Status := "Blocked" | StatusDesc := "CNAME inspection domain in exact blacklist";
+  Status=12 | Status := "Allowed" | StatusDesc := "Retried query";
+  Status=13 | Status := "Allowed" | StatusDesc := "Query ignored on retry. (DNSSEC validation in progress)";
+  Status=14 | Status := "Allowed" | StatusDesc := "Already forwarded, query dropped";
+  Status=15 | Status := "Blocked" | StatusDesc := "Query failed, database is busy";
+  Status=16 | Status := "Blocked" | StatusDesc := "Special Domain e.g. Apple Private Relay or Mozilla Canary";
+  Status=17 | Status := "Allowed" | StatusDesc := "Replied from stale cache";
+  }
+  | case {
+  ReplyType=0 | ReplyType := "Unknown";
+  ReplyType=1 | ReplyType := "NODATA";
+  ReplyType=2 | ReplyType := "NXDOMAIN";
+  ReplyType=3 | ReplyType := "CNAME";
+  ReplyType=4 | ReplyType := "IP";
+  ReplyType=5 | ReplyType := "DOMAIN";
+  ReplyType=6 | ReplyType := "RRNAME";
+  ReplyType=7 | ReplyType := "SERVFAIL";
+  ReplyType=8 | ReplyType := "REFUSED";
+  ReplyType=9 | ReplyType := "NOTIMP";
+  ReplyType=10 | ReplyType := "OTHER";
+  ReplyType=11 | ReplyType := "DNSSEC";
+  ReplyType=12 | ReplyType := "NONE";
+  ReplyType=13 | ReplyType := "BLOB";
+  }
+  | case {
+  DNSSECStatus=0 | DNSSECStatus := "Unknown";
+  DNSSECStatus=1 | DNSSECStatus := "SECURE";
+  DNSSECStatus=2 | DNSSECStatus := "INSECURE";
+  DNSSECStatus=3 | DNSSECStatus := "BOGUS";
+  DNSSECStatus=4 | DNSSECStatus := "ABANDONED";
+  }
+  | drop(timestamp)
+tagFields: []
