@@ -4,7 +4,7 @@ import argparse
 import yaml
 import requests
 from pathlib import Path
-from colorama import init
+from colorama import init as colorama_init
 from colorama import Fore, Back, Style
 from urllib.parse import urlparse
 
@@ -19,7 +19,6 @@ def verify_url(url):
     except ValueError:
         print(Fore.RED + f'ERROR - The logscale url "{logscale_url}" is not valid.')
         raise SystemExit(1)
-
 
 def verify_ingest_token(logscale_url, ingest_token):
 
@@ -61,8 +60,7 @@ def verify_pihole_db(db_path):
         raise SystemExit(1)
 
 
-
-init()
+colorama_init()
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", action="store", help="Specify path to config.yml. If this is used, any other switches are ignored.")
 parser.add_argument("-u", "--logscale_url", action="store", help="FQDN:PORT of your logscale instance. e.g. https://cloud.community.humio.com")
