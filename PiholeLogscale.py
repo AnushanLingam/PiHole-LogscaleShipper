@@ -19,10 +19,10 @@ def verify_url(url):
         if all([result.scheme, result.netloc]):
             return True
         else:
-            print(Fore.RED + f'ERROR - The logscale url "{logscale_url}" is not valid.')
+            print(Fore.RED + f'ERROR - The logscale url "{url}" is not valid.')
             raise SystemExit(1)
     except ValueError:
-        print(Fore.RED + f'ERROR - The logscale url "{logscale_url}" is not valid.')
+        print(Fore.RED + f'ERROR - The logscale url "{url}" is not valid.')
         raise SystemExit(1)
 
 def verify_ingest_token(logscale_url, ingest_token):
@@ -97,8 +97,10 @@ def ingest_messages(messages, logscale_url, ingest_token):
     }
 
     try:
+        print("INFO - Attempting to send messages to ingest endpoint.")
         response = requests.post(req_url, headers=headers, data=post_body)
         response.raise_for_status()
+        print("INFO - Messages succesfully sent to Logscale.")
     except requests.exceptions.HTTPError as errh:
         print(errh)
         raise SystemExit(1)
@@ -194,8 +196,7 @@ def main():
             #retrieve messages
             db_records = query_db(sqlite_path=pihole_db, interval_units=interval_unit, interval_value=interval_value)
             formatted_messages = format_messages(records=db_records)
-            ingest_messages(messages=formatted_messages, ingest_token=ingest_token, logscale_url=logscale_url)
-            #print(formatted_messages)
+            #ingest_messages(messages=formatted_messages, ingest_token=ingest_token, logscale_url=logscale_url)
 
     else:
         logscale_url = args.logscale_url
@@ -230,6 +231,11 @@ def main():
         verify_ingest_token(logscale_url, ingest_token)
         verify_interval_settings(interval_unit, interval_value)
         verify_pihole_db(pihole_db)
+
+        #retrieve messages
+        db_records = query_db(sqlite_path=pihole_db, interval_units=interval_unit, interval_value=interval_value)
+        formatted_messages = format_messages(records=db_records)
+        #ingest_messages(messages=formatted_messages, ingest_token=ingest_token, logscale_url=logscale_url)
 
 if __name__ == "__main__":
     main()
