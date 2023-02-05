@@ -1,10 +1,10 @@
 name: pihole-sqlite3
 tests:
-- 1675514699 2 3 mobile.events.data.microsoft.com 10.0.20.113 pihole2.bgc.co.uk None
+- 1675514699 2 3 mobile.events.data.microsoft.com 10.0.20.113 pihole2.contoso.co.uk None
   None 3 0.0005 0
 - 1675514694 1 2 www.msftncsi.com 10.0.20.72 None 208.67.222.222#53 None 3 0.0099
   0
-- 1675514699 1 14 mobile.events.data.microsoft.com 10.0.20.72 Anushan-PC.bgc.co.uk
+- 1675514699 1 14 mobile.events.data.microsoft.com 10.0.20.72 cliednt.contoso.co.uk
   None None 3 0.0004 0
 fieldsToBeRemovedBeforeParsing: []
 $schema: https://schemas.humio.com/parser/v0.2.0

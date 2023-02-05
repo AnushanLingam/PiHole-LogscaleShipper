@@ -1,0 +1,15 @@
+# Logscale endpoint URL e.g. https://cloud.community.humio.com
+logscale_url: "https://cloud.community.humio.com"
+
+# Logscale ingest token - create an ingest token in the settings page and assign the Pihole-sqllite3 parser to it.
+ingest_token: "<INGEST_TOKEN_HERE>"
+
+# Configure how far back in time you want to retrieve messages from e.g. last 5 minutes.
+message_retrieval:
+  # Acceptable options are SECONDS/MINUTES/HOURS
+  units: "MINUTES"
+  # Amount of time you want to go back as an integer
+  interval: 5
+
+# Configure location of Pihole SQLite DB
+pihole_db: "/etc/pihole/pihole-FTL.db"

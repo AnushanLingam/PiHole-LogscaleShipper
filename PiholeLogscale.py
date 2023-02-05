@@ -184,7 +184,7 @@ def main():
             logscale_url = options["logscale_url"]
             ingest_token = options["ingest_token"]
             interval_unit = options["message_retrieval"]["units"]
-            interval_value = options["message_retrieval"]["interval"]
+            interval_value = int(options["message_retrieval"]["interval"])
             pihole_db = options["pihole_db"]
 
             # Verify config options
@@ -193,16 +193,16 @@ def main():
             verify_interval_settings(interval_unit, interval_value)
             verify_pihole_db(pihole_db)
 
-            #retrieve messages
+            #retrieve and post messages
             db_records = query_db(sqlite_path=pihole_db, interval_units=interval_unit, interval_value=interval_value)
             formatted_messages = format_messages(records=db_records)
-            #ingest_messages(messages=formatted_messages, ingest_token=ingest_token, logscale_url=logscale_url)
+            ingest_messages(messages=formatted_messages, ingest_token=ingest_token, logscale_url=logscale_url)
 
     else:
         logscale_url = args.logscale_url
         ingest_token = args.ingest_token
         interval_unit = args.interval_unit
-        interval_value = args.interval_value
+        interval_value = int(args.interval_value)
         pihole_db = args.database
 
         should_exit = False
@@ -232,10 +232,10 @@ def main():
         verify_interval_settings(interval_unit, interval_value)
         verify_pihole_db(pihole_db)
 
-        #retrieve messages
+        #retrieve and post messages
         db_records = query_db(sqlite_path=pihole_db, interval_units=interval_unit, interval_value=interval_value)
         formatted_messages = format_messages(records=db_records)
-        #ingest_messages(messages=formatted_messages, ingest_token=ingest_token, logscale_url=logscale_url)
+        ingest_messages(messages=formatted_messages, ingest_token=ingest_token, logscale_url=logscale_url)
 
 if __name__ == "__main__":
     main()
