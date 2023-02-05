@@ -23,22 +23,29 @@ You can use the below options to provide the required info at runtime.
 >usage: PiholeLogscale.py [-h] [-c CONFIG] [-u LOGSCALE_URL] [-i INGEST_TOKEN] [-iu {MINUTES,SECONDS,HOURS}] [-iv INTERVAL_VALUE] [-d DATABASE]
 >
 >options:
-  -h, --help            show this help message and exit
-  -c CONFIG, --config CONFIG
-                        Specify path to config.yml. If this is used, any other switches are ignored.
-  -u LOGSCALE_URL, --logscale_url LOGSCALE_URL
-                        FQDN:PORT of your logscale instance. e.g. https://cloud.community.humio.com
-  -i INGEST_TOKEN, --ingest_token INGEST_TOKEN
-                        Ingest token from the Falcon Logscale portal. Ensure the Pihole-sqlite3 parser is assigned to this token.
-  -iu {MINUTES,SECONDS,HOURS}, --interval_unit {MINUTES,SECONDS,HOURS}
-                        The units for the time you want to fetch messages from. e.g MINUTES and 5 = retrieve last 5 minutes of queries. Default Value: MINUTES
-  -iv INTERVAL_VALUE, --interval_value INTERVAL_VALUE
-                        How far back in time you want to retrieve messages. Default Value: 5
-  -d DATABASE, --database DATABASE
-                        Specify path to pihole-ftl.db. Default value: /etc/pihole/pihole-FTL.db
+>  -h, --help            show this help message and exit
+>  -c CONFIG, --config CONFIG
+>                        Specify path to config.yml. If this is used, any other switches are ignored.
+>
+>  -u LOGSCALE_URL, --logscale_url LOGSCALE_URL
+>                        FQDN:PORT of your logscale instance. e.g. https://cloud.community.humio.com
+>
+>  -i INGEST_TOKEN, --ingest_token INGEST_TOKEN
+>                        Ingest token from the Falcon Logscale portal. Ensure the Pihole-sqlite3 parser is assigned to this token.
+>                        
+>  -iu {MINUTES,SECONDS,HOURS}, --interval_unit {MINUTES,SECONDS,HOURS}
+>                        The units for the time you want to fetch messages from. e.g MINUTES and 5 = retrieve last 5 minutes of queries.
+>
+>  -iv INTERVAL_VALUE, --interval_value INTERVAL_VALUE
+>                        How far back in time you want to retrieve messages. Default Value: 5
+>
+>  -d DATABASE, --database DATABASE
+>                        Specify path to pihole-ftl.db. Default value: /etc/pihole/pihole-FTL.db
+
 # Setting up the Parser and Ingest Token
 To make use of the ingested messages you need a valid parser in logscale to break up the raw message string into searchable fields.
-This repo contains a parser in 'LogscaleTemplates/pihole-sqlite3.yml'
-To use this with your logscale instance, create a new parser from the Parsers page in your logscale repository and then select the '**From Template**' option and select the '**pihole-sqlite3.yml**' file.
+
+This repo contains a parser in 'LogscaleTemplates/pihole-sqlite3.yml' To use this with your logscale instance, create a new parser from the Parsers page in your logscale repository and then select the '**From Template**' option and select the '**pihole-sqlite3.yml**' file.
+
 Finally create a new ingest token from the settings page and when prompted to assign a parser, choose the new parser you created above.
 You should now be ready to send messages into your instance and have them parsed correctly.
