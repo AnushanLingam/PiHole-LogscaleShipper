@@ -189,7 +189,7 @@ def main():
 
             # Verify config options
             verify_url(logscale_url)
-            #verify_ingest_token(logscale_url, ingest_token)
+            verify_ingest_token(logscale_url, ingest_token)
             verify_interval_settings(interval_unit, interval_value)
             verify_pihole_db(pihole_db)
 
